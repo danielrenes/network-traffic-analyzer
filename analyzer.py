@@ -9,6 +9,7 @@ from scapy.all import *
 
 from config import Config
 from model import SimpleData, DetailedData, DataStorage
+from msg_queue import redis_instance
 
 class Sniffer(threading.Thread):
     def __init__(self, iface):
@@ -54,20 +55,14 @@ class Sniffer(threading.Thread):
 
         stats.add(packet)
 
-class ServerSocket(threading.Thread):
-    def __init__(self, host, port, refresh_time):
-        super(ServerSocket, self).__init__()
-        print '[+] Server socket thread started'
+class Publisher(threading.Thread):
+    def __init__(self, refresh_time):
+        super(Publisher, self).__init__()
+        print '[+] Redis publisher running'
         self.refresh_time = refresh_time
         self.data_storage = None
-        self.socket = socket.socket()
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket.bind((host, port))
-        self.conn = None
 
     def run(self):
-        self.socket.listen(1)
-        self.conn = self.socket.accept()[0]
         while True:
             time.sleep(self.refresh_time)
             self.pull()
@@ -79,7 +74,7 @@ class ServerSocket(threading.Thread):
         self.data_storage = stats.convert()
 
     def push(self):
-        self.conn.send(self.data_storage.encode())
+        redis_instance.publish('packet-data' , self.data_storage.encode())
 
 class Statistics(object):
     def __init__(self):
@@ -173,12 +168,12 @@ sniffer_thread = Sniffer(Config.IFACE)
 sniffer_thread.daemon = True
 sniffer_thread.start()
 
-socket_thread = ServerSocket(Config.HOST, Config.SOCKET_PORT, Config.REFRESH_TIME)
-socket_thread.daemon = True
-socket_thread.start()
+publisher_thread = Publisher(Config.REFRESH_TIME)
+publisher_thread.daemon = True
+publisher_thread.start()
 
 try:
     while True:
         time.sleep(1)
 except KeyboardInterrupt:
-    socket_thread.socket.close()
+    pass
