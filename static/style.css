@@ -1,0 +1,8 @@
+.charts_wrapper {
+  width: calc(100% - 60px);
+  padding: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}

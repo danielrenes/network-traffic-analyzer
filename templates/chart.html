@@ -1,0 +1,110 @@
+<html>
+
+  <head>
+    <title>Chart</title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'style.css') }}"/>
+    <script type="text/javascript" src="{{ url_for('static', filename = 'Chart.min.js') }}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+  </head>
+
+  <body>
+    <div class="charts_wrapper">
+      <canvas id="chart_sent" width="600" height="600"></canvas>
+      <canvas id="chart_recv" width ="600" height="600"></canvas>
+    </div>
+  </body>
+
+  <script>
+    Chart.defaults.global.responsive = false;
+
+    Chart.defaults.global.title.display = true;
+    Chart.defaults.global.title.fontSize = 22;
+    Chart.defaults.global.title.padding = 30
+
+    Chart.defaults.global.legend.display = false;
+
+    var chartSentData = {
+      labels: [
+        {% if sent_data is not none %}
+          {% for data in sent_data %}
+            '{{ data.ip }}',
+          {% endfor %}
+        {% endif %}
+      ],
+
+      datasets: [{
+        backgroundColor: [
+        "#2ecc71",
+        "#3498db",
+        "#95a5a6",
+        "#9b59b6",
+        "#f1c40f",
+        "#e74c3c",
+        "#34495e"
+        ],
+        data: [
+          {% if sent_data is not none %}
+            {% for data in sent_data %}
+              {{ data.num_packets }},
+            {% endfor %}
+          {% endif %}
+        ]
+      }]
+    };
+
+    var contextSent = document.getElementById("chart_sent").getContext("2d");
+
+    var chartSent = new Chart(contextSent, {
+      type: "pie",
+      data: chartSentData,
+      options: {
+        title: {
+          text: "Sent"
+        }
+      }
+    });
+
+    var chartRecvData = {
+      labels: [
+        {% if recv_data is not none %}
+          {% for data in recv_data %}
+            '{{ data.ip }}',
+          {% endfor %}
+        {% endif %}
+      ],
+
+      datasets: [{
+        backgroundColor: [
+        "#2ecc71",
+        "#3498db",
+        "#95a5a6",
+        "#9b59b6",
+        "#f1c40f",
+        "#e74c3c",
+        "#34495e"
+        ],
+        data: [
+          {% if recv_data is not none %}
+            {% for data in recv_data %}
+              {{ data.num_packets }},
+            {% endfor %}
+          {% endif %}
+        ]
+      }]
+    };
+
+    var contextRecv = document.getElementById("chart_recv").getContext("2d");
+
+    var chartRecv = new Chart(contextRecv, {
+      type: "pie",
+      data: chartRecvData,
+      options: {
+        title: {
+          text: "Received"
+        }
+      }
+    });
+  </script>
+
+</html>
