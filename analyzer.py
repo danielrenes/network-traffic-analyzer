@@ -131,7 +131,7 @@ class Packet(object):
         raise NotImplementedError
 
     def __ne__(self, other):
-        return not __eq__(other)
+        return not self.__eq__(other)
 
 class SimplePacket(Packet):
     def __init__(self, src, dst):
@@ -141,7 +141,7 @@ class SimplePacket(Packet):
         if isinstance(other, self.__class__):
             return self.src == other.src and self.dst == other.dst
         else:
-            return false
+            return False
 
 class DetailedPacket(Packet):
     def __init__(self, src, dst, sport, dport, protocol):
