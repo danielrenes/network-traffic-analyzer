@@ -24,14 +24,14 @@ def message_handler(msg):
     sent_data, recv_data = data_storage.separate()
     print '[-] Update received'
 
+sent_data = None
+recv_data = None
+
 app = Flask(__name__)
 
 @app.route('/')
 def chart():
     return render_template('chart.html', sent_data=sent_data, recv_data=recv_data)
-
-sent_data = None
-recv_data = None
 
 pubsub_obj.subscribe(**{'packet-data': message_handler})
 

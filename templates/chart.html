@@ -28,7 +28,7 @@
       labels: [
         {% if sent_data is not none %}
           {% for data in sent_data %}
-            '{{ data.ip }}',
+            '{{ data["ip"] }}',
           {% endfor %}
         {% endif %}
       ],
@@ -46,7 +46,7 @@
         data: [
           {% if sent_data is not none %}
             {% for data in sent_data %}
-              {{ data.num_packets }},
+              {{ data['num_packets'] }},
             {% endfor %}
           {% endif %}
         ]
@@ -69,7 +69,7 @@
       labels: [
         {% if recv_data is not none %}
           {% for data in recv_data %}
-            '{{ data.ip }}',
+            '{{ data["ip"] }}',
           {% endfor %}
         {% endif %}
       ],
@@ -87,7 +87,7 @@
         data: [
           {% if recv_data is not none %}
             {% for data in recv_data %}
-              {{ data.num_packets }},
+              {{ data['num_packets'] }},
             {% endfor %}
           {% endif %}
         ]

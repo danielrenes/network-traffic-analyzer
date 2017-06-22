@@ -8,7 +8,7 @@ from netifaces import ifaddresses
 from scapy.all import *
 
 from config import Config
-from model import SimpleData, DetailedData, DataStorage
+from model import Data, DataStorage
 from msg_queue import redis_instance
 
 class Sniffer(threading.Thread):
@@ -96,7 +96,7 @@ class Statistics(object):
         conv_all = []
         for packet in self.packets:
             conv_one = packet.convert()
-            conv_one.num_packets = self.num_packets[packet]
+            conv_one.add(num_packets=self.num_packets[packet])
             conv_all.append(conv_one)
         return DataStorage(conv_all)
 
@@ -120,9 +120,9 @@ class Packet(object):
         protocol = self.protocol
 
         if Config.MODE == 'simple':
-            return SimpleData(typ, ip)
+            return Data(type=typ, ip=ip)
         elif Config.MODE == 'detailed':
-            return DetailedData(typ, ip, port, protocol)
+            return Data(type=typ, ip=ip, port=port, protocol=protocol)
 
     def __hash__(self):
         return hash((self.src, self.dst, self.sport, self.dport, self.protocol))
