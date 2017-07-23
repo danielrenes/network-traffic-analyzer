@@ -3,7 +3,7 @@
 import time
 import threading
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
 from redis.client import PubSubWorkerThread
 
 from config import Config
@@ -31,6 +31,24 @@ app = Flask(__name__)
 @app.route('/')
 def chart():
     return render_template('chart.html', sent_data=sent_data, recv_data=recv_data)
+
+@app.route('/refresh', methods=['GET'])
+def refresh():
+    last_index_sent = int(request.args.get('last_index_sent'))
+    last_index_recv = int(request.args.get('last_index_recv'))
+
+    if sent_data is None:
+        sent_data_since_index = []
+    else:
+        sent_data_since_index = sent_data[last_index_sent:]
+
+    if recv_data is None:
+        recv_data_since_index = []
+    else:
+        recv_data_since_index = recv_data[last_index_recv:]
+
+    print '[-] Client refreshed'
+    return jsonify({'sent': sent_data_since_index, 'recv': recv_data_since_index})
 
 pubsub_obj.subscribe(**{'packet-data': message_handler})
 
